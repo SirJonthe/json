@@ -10,7 +10,13 @@ namespace json
 	// Constants representing all JSON types.
 	enum type_id
 	{
-		TYPEID_NIL, TYPEID_INT, TYPEID_FLOAT, TYPEID_BOOL, TYPEID_STR, TYPEID_ARR, TYPEID_OBJ
+		TYPEID_NIL,
+		TYPEID_BOOL,
+		TYPEID_INT,
+		TYPEID_FLOAT,
+		TYPEID_ARR,
+		TYPEID_STR,
+		TYPEID_OBJ
 	};
 
 	// The result from a parsing operation.
@@ -25,7 +31,13 @@ namespace json
 	class data_type
 	{
 	protected:
-		char ch(uint64_t x) const;
+		static char ch(uint64_t x);
+		static uint64_t num(char ch);
+		static bool is_num(char ch);
+		static bool is_white(char ch);
+		static uint64_t skip_white(const char *s);
+		static bool is_match(const char *s1, const char *s2);
+		static char *print(char *dst, const char *src);
 
 	public:
 		// Returns the specific type of the data.
@@ -47,10 +59,15 @@ namespace json
 		int64_t value;
 
 	public:
-		type_id json_type( void ) const;
-		result<const char*> json_read(const char *json);
-		char* json_write(char *json_out) const;
-		uint64_t json_len( void ) const;
+		int_type( void );
+		int_type(int64_t val);
+		int_type(const int_type&) = default;
+		int_type &operator=(const int_type&) = default;
+
+		type_id              json_type( void ) const;
+		result<const char*>  json_read(const char *json);
+		char                *json_write(char *json_out) const;
+		uint64_t             json_len( void ) const;
 	};
 
 	class float_type : public data_type
@@ -59,6 +76,11 @@ namespace json
 		double value;
 
 	public:
+		float_type( void );
+		float_type(double val);
+		float_type(const float_type&) = default;
+		float_type &operator=(const float_type&) = default;
+
 		type_id json_type( void ) const;
 	};
 
@@ -68,7 +90,10 @@ namespace json
 		bool value;
 
 	public:
-		type_id json_type( void ) const;
+		type_id              json_type( void ) const;
+		result<const char*>  json_read(const char *json);
+		char                *json_write(char *json_out) const;
+		uint64_t             json_len( void ) const;
 	};
 
 	class string_type : public data_type
@@ -77,6 +102,8 @@ namespace json
 		char *value;
 
 	public:
+		~string_type( void );
+
 		type_id json_type( void ) const;
 	};
 
@@ -105,7 +132,10 @@ namespace json
 	class nil_type : public data_type
 	{
 	public:
-		type_id json_type( void ) const;
+		type_id              json_type( void ) const;
+		result<const char*>  json_read(const char *json);
+		char                *json_write(char *json_out) const;
+		uint64_t             json_len( void ) const;
 	};
 
 }
